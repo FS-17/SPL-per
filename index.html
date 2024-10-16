@@ -3,22 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SPL Percentage Guessing Game</title>
+    <title>SPL Guessing Game</title>
+
     <style>
+      @font-face {
+        font-family: "SPLFont";
+        src: url(./SPLfont.ttf) format("truetype");
+      }
+
       body {
-        font-family: "Roboto", sans-serif; /* Replace with SPL font if available */
+        font-family: "SPLFont", sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
-        background: linear-gradient(
-          45deg,
-          #0066b3,
-          #00a3e0
-        ); /* SPL blue gradient - replace with your exact colors */
-        color: #333;
-        overflow: hidden; /* Hide overflowing paths */
+        background: linear-gradient(45deg, #0066b3, #00a3e0);
+        color: #fff; /* Text color to white for better contrast */
+        overflow: hidden;
       }
 
       .container {
@@ -31,9 +33,9 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-align: center;
         width: 74%;
-        height: 50%;
+        height: 50%; /* Adjust height as needed */
         position: relative;
-        z-index: 1; /* Ensure container is above paths */
+        z-index: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -41,27 +43,42 @@
       }
 
       h1 {
-        color: #fff; /* Or use appropriate SPL color */
+        color: #fff;
         margin-bottom: 1rem;
       }
 
       p {
-        color: #fff; /* Or use appropriate SPL color */
+        color: #fff;
         margin-bottom: 1rem;
+        font-weight: bold;
       }
 
+      /* Range Input Styles */
       #guessInput {
         width: 100%;
-        padding: 10px;
-        font-size: 1rem;
-        border: none;
+        margin: 1rem 0;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.5);
         border-radius: 5px;
+        outline: none;
+        -webkit-appearance: none;
+      }
+      #guessInput::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #ec6707;
+        cursor: pointer;
+      }
+      #rangeValue {
+        font-size: 1.5rem;
         margin-bottom: 1rem;
-        background: rgba(255, 255, 255, 0.8);
       }
 
-      #submitGuess {
-        background-color: #ec6707; /* SPL Orange – replace as needed */
+      button {
+        background-color: #ec6707;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -71,75 +88,23 @@
         transition: background-color 0.3s;
       }
 
-      #submitGuess:hover {
-        background-color: darken(#ec6707, 10%); /* Darken on hover */
+      button:hover {
+        background-color: darken(#ec6707, 10%);
       }
 
-      #result {
+      #results {
         margin-top: 1rem;
         font-weight: bold;
         color: #fff;
       }
 
-      /* SPL Path Styles (Example - Customize these heavily) */
-      .spl-path {
+      svg {
         position: absolute;
-        background-color: #fe0000; /* SPL secondary blue – replace */
-        height: 10px;
-        z-index: 0; /* Behind the container */
-      }
-
-      .path1 {
-        /* Example Path 1 – Customize position/transform*/
-        width: 50%;
-        height: 40px;
-        left: 0%;
-        top: 50%;
-        /* left: 10%; */
-
-        /* transform: rotate(45deg); */
-        background-color: #00c8e1; /* SPL primary blue – replace */
-      }
-
-      .path2 {
-        /* Example Path 2 */
-        width: 50%;
-        height: 40px;
-        left: 0%;
-        top: 55%;
-        background-color: #153c3f;
-      }
-
-      /* Range Input Styles */
-      input[type="range"] {
-        -webkit-appearance: none; /* Override default styles */
+        z-index: 0;
         width: 100%;
-        margin: 1rem 0;
-        height: 10px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 5px;
-        outline: none;
+        height: 100%;
       }
 
-      /* Thumb styles (the draggable part) */
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #ec6707; /* Use SPL orange or your choice */
-        cursor: pointer;
-      }
-
-      /* rangeValue styles */
-      #rangeValue {
-        color: #fff;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-      }
-
-      /* logo */
       .logo {
         position: absolute;
         top: 1rem;
@@ -149,22 +114,11 @@
     </style>
   </head>
   <body>
-    <!-- logo -->
     <div class="logo">
       <img src="./spl.png" alt="SPL Logo" width="100" />
     </div>
 
-    <!-- <div class="spl-path path1"></div>
-    <div class="spl-path path2"></div> -->
-
-    <!-- display svg img
-    <div class="spl-path path1"></div>
-    <div class="spl-path path2"></div> -->
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 800 400"
-      style="position: absolute; z-index: 0; width: 100%; height: 100%"
-    >
+    <svg viewBox="0 0 800 400">
       <path
         d="M0 200 H300 L500 300 H800"
         fill="none"
@@ -179,38 +133,54 @@
       />
     </svg>
 
-    <!-- use ./img/spl-logo.svg -->
-
-    <!-- Add more path elements as needed -->
-
     <div class="container">
       <h1>Guess the Percentage!</h1>
-      <p>Guess the percentage of this year's</p>
-      <input type="range" id="guessInput" min="1" max="100" value="50" />
+      <p>في 2023، كان مؤشر تفاعل الموظفين 80% .. تتوقع كم بيصير في 2024؟</p>
+      <input
+        type="range"
+        id="guessInput"
+        min="0"
+        max="100"
+        value="50"
+        step="1"
+      />
       <div id="rangeValue">50%</div>
-      <br />
-      <button id="submitGuess">Submit Guess</button>
-      <div id="result"></div>
+
+      <button id="displayResults">Display Results</button>
+      <div id="results"></div>
     </div>
 
     <script>
-      //   Get the range input and the submit button
-      const rangeInput = document.getElementById("guessInput");
-      const submitButton = document.getElementById("submitGuess");
-      const result = document.getElementById("result");
+      const targetPercentage = 90;
+      let guesses = [];
 
-      //   Update the range value display
-      rangeInput.addEventListener("input", function () {
-        document.getElementById("rangeValue").textContent = `${this.value}%`;
+      const guessInput = document.getElementById("guessInput");
+      const rangeValue = document.getElementById("rangeValue");
+
+      guessInput.addEventListener("input", function () {
+        console.log(this.value);
+        rangeValue.textContent = `${this.value}%`;
       });
 
-      //   Handle the submit button click
-      submitButton.addEventListener("click", function () {
-        const guess = rangeInput.value;
-        const actualPercentage = 55; // Change this to the actual percentage
+      document
+        .getElementById("displayResults")
+        .addEventListener("click", () => {
+          const guess = parseInt(guessInput.value);
+          guesses.push(guess);
 
-        result.textContent = `Your guess: ${guess}% | Actual percentage: ${actualPercentage}%`;
-      });
+          const totalGuesses = guesses.length;
+          const averageGuess =
+            guesses.reduce((sum, value) => sum + value, 0) / totalGuesses;
+
+          const resultsDiv = document.getElementById("results");
+          resultsDiv.innerHTML = `
+                <p>Total guesses: ${totalGuesses}</p>
+                <p>Average guess: ${averageGuess.toFixed(2)}%</p>
+            `;
+
+          guessInput.value = 50;
+          rangeValue.textContent = "50%";
+        });
     </script>
   </body>
 </html>
