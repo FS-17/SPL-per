@@ -21,6 +21,17 @@
         background: linear-gradient(45deg, #0066b3, #00a3e0);
         color: #fff; /* Text color to white for better contrast */
         overflow: hidden;
+        position: relative;
+      }
+
+      body > svg:first-of-type {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
       }
 
       .container {
@@ -69,7 +80,7 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background: #ec6707;
+        background: #935da5;
         cursor: pointer;
       }
       #rangeValue {
@@ -78,7 +89,7 @@
       }
 
       button {
-        background-color: #ec6707;
+        background-color: #935da5;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -89,7 +100,7 @@
       }
 
       button:hover {
-        background-color: darken(#ec6707, 10%);
+        background-color: #7a3f8d;
       }
 
       #results {
@@ -111,31 +122,68 @@
         left: 1rem;
         z-index: 1;
       }
+
+      .BottomLine {
+        /* make it in the bottom */
+        position: absolute;
+        bottom: 1rem;
+        /* right: 1rem; */
+        z-index: 1;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
     <div class="logo">
       <img src="./spl.png" alt="SPL Logo" width="100" />
     </div>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100%"
+      height="100%"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 60"
+    >
+      <defs>
+        <linearGradient id="fadeGradient" x1="0%" y1="0%" x2="0%" y2="24%">
+          <stop
+            offset="0%"
+            style="stop-color: rgba(255, 255, 255, 0.2); stop-opacity: 1"
+          />
+          <stop
+            offset="100%"
+            style="stop-color: rgba(255, 255, 255, 0); stop-opacity: 1"
+          />
+        </linearGradient>
+      </defs>
+      <g fill="none" stroke="url(#fadeGradient)" stroke-width="0.2">
+        <!-- Original diagonal lines (top-left to bottom-right) -->
+        <path
+          d="M0 0 L100 100 M10 0 L110 100 M20 0 L120 100 M30 0 L130 100 M40 0 L140 100"
+        />
+        <path
+          d="M50 0 L150 100 M60 0 L160 100 M70 0 L170 100 M80 0 L180 100 M90 0 L190 100"
+        />
+        <path
+          d="M0 10 L100 110 M0 20 L100 120 M0 30 L100 130 M0 40 L100 140 M0 50 L100 150"
+        />
 
-    <svg viewBox="0 0 800 400">
-      <path
-        d="M0 200 H300 L500 300 H800"
-        fill="none"
-        stroke="#00c8e1"
-        stroke-width="60"
-      />
-      <path
-        d="M0 260 H300 L500 100 H800"
-        fill="none"
-        stroke="#153c3f"
-        stroke-width="60"
-      />
+        <!-- New diagonal lines (top-right to bottom-left) -->
+        <path
+          d="M100 0 L0 100 M110 0 L10 100 M120 0 L20 100 M130 0 L30 100 M140 0 L40 100"
+        />
+        <path
+          d="M150 0 L50 100 M160 0 L60 100 M170 0 L70 100 M180 0 L80 100 M190 0 L90 100"
+        />
+        <path
+          d="M100 10 L0 110 M100 20 L0 120 M100 30 L0 130 M100 40 L0 140 M100 50 L0 150"
+        />
+      </g>
     </svg>
 
     <div class="container">
-      <h1>Guess the Percentage!</h1>
-      <p>في 2023، كان مؤشر تفاعل الموظفين 80% .. تتوقع كم بيصير في 2024؟</p>
+      <h1>في 2023، كان مؤشر تفاعل الموظفين 80% .. تتوقع كم بيصير في 2024؟</h1>
+      <br />
       <input
         type="range"
         id="guessInput"
@@ -149,6 +197,8 @@
       <button id="displayResults">Display Results</button>
       <div id="results"></div>
     </div>
+
+    <img src="./BL.png" alt="BL" class="BottomLine" />
 
     <script>
       const targetPercentage = 90;
