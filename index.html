@@ -244,126 +244,131 @@
     <img src="./BL.png" alt="BL" class="BottomLine" />
 
     <script>
-      lang = "ar";
+      // Move these variables into a more appropriate scope
+      let totalGuesses = 0;
+      let averageGuess = 0;
+      let lang = "ar";
       const targetPercentage = 90;
       let guesses = [];
-
-      // database to store the results
       url = "https://spl-per-default-rtdb.firebaseio.com/spl.json";
-      // to delete data
-      Durl = "https://spl-per-default-rtdb.firebaseio.com/delete.json";
 
-      getData(Durl).then((data) => {
-        // make it from json to boolean
-        data = Object.values(data);
-
-        // if data is array and not empty take the first element
-        if (Array.isArray(data) && data.length > 0) {
-          data = data[0];
+      // Function to update the results display
+      function updateResultsDisplay() {
+        const resultsDiv = document.getElementById("results");
+        if (lang == "ar") {
+          resultsDiv.innerHTML = `
+        <p>إجمالي النتائج: ${totalGuesses}</p>
+        <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
+      `;
+        } else {
+          resultsDiv.innerHTML = `
+        <p>Total guesses: ${totalGuesses}</p>
+        <p>Average guess: ${averageGuess.toFixed(2)}%</p>
+      `;
         }
-
-        if (data) {
-          deleteData();
-          // make durl false
-          postData(Durl, false).then((data) => {
-            console.log(data);
-          });
-        }
-      });
-
-      totalGuesses = localStorage.getItem("totalGuesses");
-      averageGuess = localStorage.getItem("averageGuess");
-
-      // cange the type
-      totalGuesses = parseInt(totalGuesses);
-      averageGuess = parseFloat(averageGuess);
-
-      if (totalGuesses == null || isNaN(totalGuesses)) {
-        totalGuesses = 0;
-      }
-      if (averageGuess == null || isNaN(averageGuess)) {
-        averageGuess = 0;
       }
 
-      document.getElementById("results").innerHTML = `
-                <p>إجمالي النتائج: ${totalGuesses}</p>
-                <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
-            `;
+      // Initialize data when page loads
+      async function initializeData() {
+        try {
+          const data = await getData(url);
+          if (data) {
+            totalGuesses = 0;
+            let totalSum = 0;
 
-      const guessInput = document.getElementById("guessInput");
-      const rangeValue = document.getElementById("rangeValue");
+            for (const key in data) {
+              if (Object.hasOwnProperty.call(data, key)) {
+                const element = data[key];
+                totalGuesses++;
+                totalSum += element.guess;
+              }
+            }
+
+            averageGuess = totalGuesses > 0 ? totalSum / totalGuesses : 0;
+          } else {
+            console.log("No data found");
+            totalGuesses = 0;
+            averageGuess = 0;
+          }
+        } catch (error) {
+          console.error("Error fetching initial data:", error);
+        }
+        updateResultsDisplay();
+      }
+
+      // Call initialization when page loads
+      initializeData();
+
+      // Update the display results event listener
+      document
+        .getElementById("displayResults")
+        .addEventListener("click", async () => {
+          const guess = parseInt(guessInput.value);
+
+          averageGuess = (averageGuess * totalGuesses + guess) / ++totalGuesses;
+
+          // Update display
+          updateResultsDisplay();
+
+          // Reset input
+          guessInput.value = 50;
+          rangeValue.textContent = "50%";
+
+          try {
+            // Post the new guess
+            await postData(url, {
+              time: new Date().toLocaleTimeString(),
+              guess: guess,
+            });
+
+            // Fetch updated data
+            // const data = await getData(url);
+            // if (data) {
+            //   totalGuesses = 0;
+            //   let totalSum = 0;
+
+            //   for (const key in data) {
+            //     if (Object.hasOwnProperty.call(data, key)) {
+            //       const element = data[key];
+            //       totalGuesses++;
+            //       totalSum += element.guess;
+            //     }
+            //   }
+
+            //   averageGuess = totalGuesses > 0 ? totalSum / totalGuesses : 0;
+            // }
+          } catch (error) {
+            console.error("Error updating data:", error);
+          }
+        });
 
       guessInput.addEventListener("input", function () {
         rangeValue.textContent = `${this.value}%`;
       });
 
-      // display the results when the button is clicked
-      document
-        .getElementById("displayResults")
-        .addEventListener("click", () => {
-          const guess = parseInt(guessInput.value);
-          guesses.push(guess);
-
-          totalGuesses = guesses.length;
-          averageGuess =
-            guesses.reduce((sum, value) => sum + value, 0) / totalGuesses;
-
-          const resultsDiv = document.getElementById("results");
-          if (lang == "ar") {
-            resultsDiv.innerHTML = `
-                <p>إجمالي النتائج: ${totalGuesses}</p>
-                <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
-            `;
-          } else {
-            resultsDiv.innerHTML = `
-                <p>Total guesses: ${totalGuesses}</p>
-                <p>Average guess: ${averageGuess.toFixed(2)}%</p>
-            `;
-          }
-          guessInput.value = 50;
-          rangeValue.textContent = "50%";
-          postData(url, {
-            // time now hh:mm:ss
-            time: new Date().toLocaleTimeString(),
-            guess: guess,
-          }).then((data) => {
-            console.log(data);
-          });
-        });
-
+      // Update the language change event listener
       document.getElementById("btnlang").addEventListener("click", () => {
-        console.log("changing language");
-        if (lang == "ar") {
-          lang = "en";
+        lang = lang === "ar" ? "en" : "ar";
+
+        if (lang === "en") {
           document.getElementById("displayResults").textContent =
             "Display Results";
           document.getElementById("rangeValue").textContent = "50%";
-          document.getElementById("results").innerHTML = `
-                <p>Total guesses: ${totalGuesses}</p>
-                <p>Average guess: ${averageGuess.toFixed(2)}%</p>
-            `;
           document.querySelector("h1").textContent =
-            "In 2023, the employee engagement score was 80%. What do you think 2024’s score will be?";
+            "In 2023, the employee engagement score was 80%. What do you think 2024's score will be?";
           document.getElementById("langbtn").textContent = "Change Language";
         } else {
-          lang = "ar";
           document.getElementById("displayResults").textContent = "عرض النتائج";
           document.getElementById("rangeValue").textContent = "50%";
-          document.getElementById("results").innerHTML = `
-                <p>إجمالي النتائج: ${totalGuesses}</p>
-                <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
-            `;
           document.querySelector("h1").textContent =
             "في 2023، كان مؤشر تفاعل الموظفين 80% .. تتوقع كم بيصير في 2024؟";
           document.getElementById("langbtn").textContent = "تغيير اللغة";
         }
+
+        updateResultsDisplay();
       });
 
       function postData(url = "", data = {}) {
-        // cache the total guesses and average guess
-        localStorage.setItem("totalGuesses", totalGuesses);
-        localStorage.setItem("averageGuess", averageGuess);
-
         // Default options are marked with *
         return fetch(url, {
           method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -395,19 +400,6 @@
           referrerPolicy: "no-referrer", // no-referrer, *client
         }).then((response) => response.json()); // parses JSON response into native JavaScript objects
       }
-
-      function deleteData() {
-        // remove the data in the cache
-        localStorage.removeItem("totalGuesses");
-        localStorage.removeItem("averageGuess");
-
-        // update total guesses and average guess
-        totalGuesses = 0;
-        averageGuess = 0;
-      }
-
-      console.log(localStorage.getItem("totalGuesses"));
-      console.log(localStorage.getItem("averageGuess"));
     </script>
   </body>
 </html>

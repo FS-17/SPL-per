@@ -196,8 +196,6 @@
 
     <script>
       const dataUrl = "https://spl-per-default-rtdb.firebaseio.com/spl.json";
-      const deleteUrl =
-        "https://spl-per-default-rtdb.firebaseio.com/delete.json";
 
       async function fetchData() {
         try {
@@ -213,27 +211,13 @@
       async function deleteData() {
         try {
           //   send to deleteUrl
-          const response = await fetch(deleteUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(true),
+          const response = await fetch(dataUrl, {
+            method: "DELETE",
           });
           if (response.ok) {
             alert("Data deleted successfully");
             updateDashboard();
           }
-        } catch (error) {
-          console.error("Error deleting data:", error);
-          alert("Error deleting data");
-        }
-
-        // and delete all data from dataUrl
-        try {
-          const response = await fetch(dataUrl, {
-            method: "DELETE",
-          });
         } catch (error) {
           console.error("Error deleting data:", error);
           alert("Error deleting data");
