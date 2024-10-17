@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SPL Guessing Game</title>
+    <!-- disable cors -->
+    <!-- use Access-Control-Allow-Origin: * in the server -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
 
     <style>
       @font-face {
@@ -304,6 +310,27 @@
           document.getElementById("langbtn").textContent = "تغيير اللغة";
         }
       });
+
+      // database to store the results
+      utl = "https://spl-per-default-rtdb.firebaseio.com/test";
+      // send simple data for testing
+      fetch(utl, {
+        method: "POST",
+        body: JSON.stringify({
+          totalGuesses: totalGuesses,
+          averageGuess: averageGuess,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     </script>
   </body>
 </html>
