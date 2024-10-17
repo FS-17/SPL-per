@@ -18,7 +18,7 @@
         align-items: center;
         height: 100vh;
         margin: 0;
-        background: linear-gradient(45deg, #09C8E0, #09C8E0);
+        background-color: #09c8e0;
         color: #fff; /* Text color to white for better contrast */
         overflow: hidden;
         position: relative;
@@ -90,6 +90,7 @@
 
       button {
         background-color: #935da5;
+        font-family: inherit;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -123,12 +124,35 @@
         z-index: 1;
       }
 
+      .logo2 {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1;
+        padding: 1rem;
+
+        /* make the button not take a space, and dont push other elements */
+        display: inline-block;
+      }
+
+      .langbtn {
+        /* position: absolute; */
+
+        background-color: #935da5;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
       .BottomLine {
         /* make it in the bottom */
         position: absolute;
         bottom: 1rem;
         /* right: 1rem; */
-        z-index: 1;
+        z-index: -1;
         width: 100%;
       }
     </style>
@@ -136,7 +160,20 @@
   <body>
     <div class="logo">
       <img src="./spl.png" alt="SPL Logo" width="150" />
+      <!-- <img src="./logo2AR.png" alt="SPL Logo" width="150" /> -->
     </div>
+    <!-- add logo2.png to right top corner -->
+    <div class="logo2">
+      <!-- <img src="./logo2AR.png" alt="SPL Logo" width="150" /> -->
+
+      <!-- glass button -->
+      <button class="langbtn" id="btnlang">
+        <a style="color: white; text-decoration: none" id="langbtn">
+          تغيير اللغة
+        </a>
+      </button>
+    </div>
+
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="100%"
@@ -194,21 +231,23 @@
       />
       <div id="rangeValue">50%</div>
 
-      <button id="displayResults">Display Results</button>
+      <button id="displayResults">عرض النتائج</button>
       <div id="results"></div>
     </div>
 
     <img src="./BL.png" alt="BL" class="BottomLine" />
 
     <script>
+      lang = "ar";
       const targetPercentage = 90;
       let guesses = [];
+      totalGuesses = 0;
+      averageGuess = 0;
 
       const guessInput = document.getElementById("guessInput");
       const rangeValue = document.getElementById("rangeValue");
 
       guessInput.addEventListener("input", function () {
-        console.log(this.value);
         rangeValue.textContent = `${this.value}%`;
       });
 
@@ -218,19 +257,53 @@
           const guess = parseInt(guessInput.value);
           guesses.push(guess);
 
-          const totalGuesses = guesses.length;
-          const averageGuess =
+          totalGuesses = guesses.length;
+          averageGuess =
             guesses.reduce((sum, value) => sum + value, 0) / totalGuesses;
 
           const resultsDiv = document.getElementById("results");
-          resultsDiv.innerHTML = `
+          if (lang == "ar") {
+            resultsDiv.innerHTML = `
+                <p>إجمالي النتائج: ${totalGuesses}</p>
+                <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
+            `;
+          } else {
+            resultsDiv.innerHTML = `
                 <p>Total guesses: ${totalGuesses}</p>
                 <p>Average guess: ${averageGuess.toFixed(2)}%</p>
             `;
-
+          }
           guessInput.value = 50;
           rangeValue.textContent = "50%";
         });
+
+      document.getElementById("btnlang").addEventListener("click", () => {
+        console.log("changing language");
+        if (lang == "ar") {
+          lang = "en";
+          document.getElementById("displayResults").textContent =
+            "Display Results";
+          document.getElementById("rangeValue").textContent = "50%";
+          document.getElementById("results").innerHTML = `
+                <p>Total guesses: ${totalGuesses}</p>
+                <p>Average guess: ${averageGuess.toFixed(2)}%</p>
+            `;
+          document.querySelector("h1").textContent =
+            "In 2023, the employee engagement score was 80%. What do you think 2024’s score will be?";
+          document.getElementById("langbtn").textContent = "Change Language";
+        } else {
+          lang = "ar";
+          document.getElementById("displayResults").textContent = "عرض النتائج";
+          document.getElementById("rangeValue").textContent = "50%";
+          document.getElementById("results").innerHTML = `
+                <p>إجمالي النتائج: ${totalGuesses}</p>
+                <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
+            `;
+          document.querySelector("h1").textContent =
+            "في 2023، كان مؤشر تفاعل الموظفين 80% .. تتوقع كم بيصير في 2024؟";
+          document.getElementById("langbtn").textContent = "تغيير اللغة";
+        }
+      });
     </script>
   </body>
 </html>
