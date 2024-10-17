@@ -247,8 +247,48 @@
       lang = "ar";
       const targetPercentage = 90;
       let guesses = [];
-      totalGuesses = 0;
-      averageGuess = 0;
+
+      // database to store the results
+      url = "https://spl-per-default-rtdb.firebaseio.com/spl.json";
+      // to delete data
+      Durl = "https://spl-per-default-rtdb.firebaseio.com/delete.json";
+
+      getData(Durl).then((data) => {
+        // make it from json to boolean
+        data = Object.values(data);
+
+        // if data is array and not empty take the first element
+        if (Array.isArray(data) && data.length > 0) {
+          data = data[0];
+        }
+
+        if (data) {
+          deleteData();
+          // make durl false
+          postData(Durl, false).then((data) => {
+            console.log(data);
+          });
+        }
+      });
+
+      totalGuesses = localStorage.getItem("totalGuesses");
+      averageGuess = localStorage.getItem("averageGuess");
+
+      // cange the type
+      totalGuesses = parseInt(totalGuesses);
+      averageGuess = parseFloat(averageGuess);
+
+      if (totalGuesses == null || isNaN(totalGuesses)) {
+        totalGuesses = 0;
+      }
+      if (averageGuess == null || isNaN(averageGuess)) {
+        averageGuess = 0;
+      }
+
+      document.getElementById("results").innerHTML = `
+                <p>إجمالي النتائج: ${totalGuesses}</p>
+                <p>%متوسط النتائج: ${averageGuess.toFixed(2)}</p>
+            `;
 
       const guessInput = document.getElementById("guessInput");
       const rangeValue = document.getElementById("rangeValue");
@@ -257,6 +297,7 @@
         rangeValue.textContent = `${this.value}%`;
       });
 
+      // display the results when the button is clicked
       document
         .getElementById("displayResults")
         .addEventListener("click", () => {
@@ -281,6 +322,13 @@
           }
           guessInput.value = 50;
           rangeValue.textContent = "50%";
+          postData(url, {
+            // time now hh:mm:ss
+            time: new Date().toLocaleTimeString(),
+            guess: guess,
+          }).then((data) => {
+            console.log(data);
+          });
         });
 
       document.getElementById("btnlang").addEventListener("click", () => {
@@ -311,26 +359,55 @@
         }
       });
 
-      // database to store the results
-      utl = "https://spl-per-default-rtdb.firebaseio.com/test";
-      // send simple data for testing
-      fetch(utl, {
-        method: "POST",
-        body: JSON.stringify({
-          totalGuesses: totalGuesses,
-          averageGuess: averageGuess,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+      function postData(url = "", data = {}) {
+        // cache the total guesses and average guess
+        localStorage.setItem("totalGuesses", totalGuesses);
+        localStorage.setItem("averageGuess", averageGuess);
+
+        // Default options are marked with *
+        return fetch(url, {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          redirect: "follow", // manual, *follow, error
+          referrerPolicy: "no-referrer", // no-referrer, *client
+          body: JSON.stringify(data), // body data type must match "Content-Type" header
+        }).then((response) => response.json()); // parses JSON response into native JavaScript objects
+      }
+
+      function getData(url = "") {
+        // Default options are marked with *
+        return fetch(url, {
+          method: "GET", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          redirect: "follow", // manual, *follow, error
+          referrerPolicy: "no-referrer", // no-referrer, *client
+        }).then((response) => response.json()); // parses JSON response into native JavaScript objects
+      }
+
+      function deleteData() {
+        // remove the data in the cache
+        localStorage.removeItem("totalGuesses");
+        localStorage.removeItem("averageGuess");
+
+        // update total guesses and average guess
+        totalGuesses = 0;
+        averageGuess = 0;
+      }
+
+      console.log(localStorage.getItem("totalGuesses"));
+      console.log(localStorage.getItem("averageGuess"));
     </script>
   </body>
 </html>

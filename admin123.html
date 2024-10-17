@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPL Dashboard</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
+    <style>
+      @font-face {
+        font-family: "SPLFont";
+        src: url(./SPLfont.ttf) format("truetype");
+      }
+
+      body {
+        font-family: "SPLFont", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #09c8e0;
+        color: #fff;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      body > svg:first-of-type {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 80%;
+        margin: 2rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        margin-top: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      th {
+        background: rgba(147, 93, 165, 0.3);
+      }
+
+      .delete-btn {
+        background-color: #ff4444;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-family: inherit;
+        margin-top: 1rem;
+      }
+
+      .delete-btn:hover {
+        background-color: #cc0000;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      .stat-card {
+        background: rgba(147, 93, 165, 0.2);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      .logo {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo">
+      <img src="./spl.png" alt="SPL Logo" width="150" />
+    </div>
+
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100%"
+      height="100%"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 60"
+    >
+      <defs>
+        <linearGradient id="fadeGradient" x1="0%" y1="0%" x2="0%" y2="24%">
+          <stop
+            offset="0%"
+            style="stop-color: rgba(255, 255, 255, 0.2); stop-opacity: 1"
+          />
+          <stop
+            offset="100%"
+            style="stop-color: rgba(255, 255, 255, 0); stop-opacity: 1"
+          />
+        </linearGradient>
+      </defs>
+      <g fill="none" stroke="url(#fadeGradient)" stroke-width="0.2">
+        <path
+          d="M0 0 L100 100 M10 0 L110 100 M20 0 L120 100 M30 0 L130 100 M40 0 L140 100"
+        />
+        <path
+          d="M50 0 L150 100 M60 0 L160 100 M70 0 L170 100 M80 0 L180 100 M90 0 L190 100"
+        />
+        <path
+          d="M0 10 L100 110 M0 20 L100 120 M0 30 L100 130 M0 40 L100 140 M0 50 L100 150"
+        />
+        <path
+          d="M100 0 L0 100 M110 0 L10 100 M120 0 L20 100 M130 0 L30 100 M140 0 L40 100"
+        />
+        <path
+          d="M150 0 L50 100 M160 0 L60 100 M170 0 L70 100 M180 0 L80 100 M190 0 L90 100"
+        />
+        <path
+          d="M100 10 L0 110 M100 20 L0 120 M100 30 L0 130 M100 40 L0 140 M100 50 L0 150"
+        />
+      </g>
+    </svg>
+
+    <div class="container">
+      <h1>SPL Dashboard</h1>
+
+      <div class="stats">
+        <div class="stat-card">
+          <h3>Total Entries</h3>
+          <p id="totalEntries">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Average Guess</h3>
+          <p id="averageGuess">0%</p>
+        </div>
+        <div class="stat-card">
+          <h3>Latest Entry</h3>
+          <p id="latestEntry">-</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Guess</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable"></tbody>
+        </table>
+      </div>
+
+      <button class="delete-btn" id="deleteData">Delete All Data</button>
+    </div>
+
+    <script>
+      const dataUrl = "https://spl-per-default-rtdb.firebaseio.com/spl.json";
+      const deleteUrl =
+        "https://spl-per-default-rtdb.firebaseio.com/delete.json";
+
+      async function fetchData() {
+        try {
+          const response = await fetch(dataUrl);
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          return null;
+        }
+      }
+
+      async function deleteData() {
+        try {
+          //   send to deleteUrl
+          const response = await fetch(deleteUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(true),
+          });
+          if (response.ok) {
+            alert("Data deleted successfully");
+            updateDashboard();
+          }
+        } catch (error) {
+          console.error("Error deleting data:", error);
+          alert("Error deleting data");
+        }
+
+        // and delete all data from dataUrl
+        try {
+          const response = await fetch(dataUrl, {
+            method: "DELETE",
+          });
+        } catch (error) {
+          console.error("Error deleting data:", error);
+          alert("Error deleting data");
+        }
+      }
+
+      function updateStats(data) {
+        const entries = Object.values(data || {});
+        const totalEntries = entries.length;
+        const averageGuess =
+          entries.reduce((sum, entry) => sum + entry.guess, 0) / totalEntries ||
+          0;
+        const latestEntry = entries[entries.length - 1];
+
+        document.getElementById("totalEntries").textContent = totalEntries;
+        document.getElementById(
+          "averageGuess"
+        ).textContent = `${averageGuess.toFixed(2)}%`;
+        document.getElementById("latestEntry").textContent = latestEntry
+          ? latestEntry.time
+          : "-";
+      }
+
+      function updateTable(data) {
+        const tableBody = document.getElementById("dataTable");
+        tableBody.innerHTML = "";
+
+        if (data) {
+          Object.values(data).forEach((entry) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                  <td>${entry.time}</td>
+                  <td>${entry.guess}%</td>
+                `;
+            tableBody.appendChild(row);
+          });
+        }
+      }
+
+      async function updateDashboard() {
+        const data = await fetchData();
+        updateStats(data);
+        updateTable(data);
+      }
+
+      document
+        .getElementById("deleteData")
+        .addEventListener("click", async () => {
+          if (confirm("Are you sure you want to delete all data?")) {
+            await deleteData();
+          }
+        });
+
+      // Initial load
+      updateDashboard();
+
+      // Refresh every 30 seconds
+      setInterval(updateDashboard, 30000);
+    </script>
+  </body>
+</html>
